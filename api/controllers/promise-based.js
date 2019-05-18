@@ -8,11 +8,13 @@ export default {
   syncRequestError,
   asyncRequest,
   customErrorHandling,
-  // painful to use :
-  // • need to return a Promise…
+  // Using express-async-handler with promises is painful to use
+  // • need to return be sure to return Promise
+  // • it's not the case with async/await because they ALWAYS return a promise
+  // • need to be wrapped
   asyncHandlerWrapped: asyncHandler(asyncHandlerWrapped),
   // if we forget to catch somewhere Node will throw a
-  // • UnhandledPromiseRejectionWarning: Error: validation fail for itemId
+  // • UnhandledPromiseRejectionWarning: Error: validation fail for itemParam
   asyncNoWrapper: asyncHandlerWrapped,
 };
 
@@ -31,12 +33,12 @@ function syncRequestError(req, res) {
 }
 
 function asyncRequest(req, res, next) {
-  const { itemId } = req.params;
-  db.getItem(itemId)
+  const { itemParam } = req.params;
+  db.getItem(itemParam)
     .then(item => {
       // we can throw sooner
       // • this will be handled by our .catch()
-      if (!item) throw appErrors.noItem({ itemId });
+      if (!item) throw appErrors.noItem({ itemParam });
       return db.getTableJoinItem(item.joinId);
     })
     .then(joinItem => {
@@ -47,13 +49,12 @@ function asyncRequest(req, res, next) {
 }
 
 function customErrorHandling(req, res, next) {
-  const { itemId } = req.params;
+  const { itemParam } = req.params;
   return db
-    .getItem(itemId)
+    .getItem(itemParam)
     .then(item => {
-      if (!item) throw appErrors.noItem({ itemId });
-      // make a subtle typo
-      return db.getTableJoinItem(item.joinID);
+      if (!item) throw appErrors.noItem({ itemParam });
+      return db.getTableJoinItem(item.joinId);
     })
     .then(joinItem => {
       res.json(joinItem);
@@ -64,12 +65,12 @@ function customErrorHandling(req, res, next) {
 }
 
 function asyncHandlerWrapped(req, res, next) {
-  const { itemId } = req.params;
+  const { itemParam } = req.params;
   // we need to return the Promise for express-async-handler to operate
   return db
-    .getItem(itemId)
+    .getItem(itemParam)
     .then(item => {
-      if (!item) throw appErrors.noItem({ itemId });
+      if (!item) throw appErrors.noItem({ itemParam });
       return db.getTableJoinItem(item.joinId);
     })
     .then(joinItem => {

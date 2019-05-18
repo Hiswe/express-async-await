@@ -3,11 +3,6 @@ import asyncHandler from 'express-async-handler';
 import * as appErrors from '../../helpers/application-errors.js';
 import * as db from '../services/db.js';
 
-const faultyJSON = `{
-  "foo": 300,
-  bar: "baz
-}`;
-
 export default {
   syncRequest: asyncHandler(syncRequest),
   syncRequestError: asyncHandler(syncRequestError),
@@ -18,7 +13,7 @@ export default {
   // and easy to spot if we miss one
   asyncHandlerWrapped: asyncHandler(asyncHandlerWrapped),
   // if we forget to catch somewhere Node will throw a
-  // • UnhandledPromiseRejectionWarning: Error: validation fail for itemId
+  // • UnhandledPromiseRejectionWarning: Error: validation fail for itemParam
   asyncNoWrapper: asyncHandlerWrapped,
   validationRequest: asyncHandler(validationRequest),
   faultyJson: asyncHandler(faultyJson),
@@ -40,13 +35,13 @@ async function syncRequestError(req, res) {
 }
 
 async function asyncRequest(req, res, next) {
-  const { itemId } = req.params;
+  const { itemParam } = req.params;
   try {
-    const item = await db.getItem(itemId);
+    const item = await db.getItem(itemParam);
     // we can throw sooner
     // • this will be handled by our catch()
     // • even other JS errors will be handled (like JSON.parse)
-    if (!item) throw appErrors.noItem({ itemId });
+    if (!item) throw appErrors.noItem({ itemParam });
     const joinItem = await db.getTableJoinItem(item.joinId);
     res.json(joinItem);
   } catch (error) {
@@ -56,12 +51,11 @@ async function asyncRequest(req, res, next) {
 }
 
 async function customErrorHandling(req, res, next) {
-  const { itemId } = req.params;
+  const { itemParam } = req.params;
   try {
-    const item = await db.getItem(itemId);
-    if (!item) throw appErrors.noItem({ itemId });
-    // make a subtle typo
-    const joinItem = await db.getTableJoinItem(item.joinID);
+    const item = await db.getItem(itemParam);
+    if (!item) throw appErrors.noItem({ itemParam });
+    const joinItem = await db.getTableJoinItem(item.joinId);
     res.json(joinItem);
   } catch (error) {
     // get another error
@@ -69,29 +63,35 @@ async function customErrorHandling(req, res, next) {
   }
 }
 
-// we can remove the global try/catch by wrapping with express-async-handler
+// Above we are repeating a global try/catch
+// • we can remove it by wrapping with express-async-handler
+// • be careful to wrapped it in the exports!
 async function asyncHandlerWrapped(req, res, next) {
-  const { itemId } = req.params;
-  const item = await db.getItem(itemId);
-  if (!item) throw appErrors.noItem({ itemId });
+  const { itemParam } = req.params;
+  const item = await db.getItem(itemParam);
+  if (!item) throw appErrors.noItem({ itemParam });
   const joinItem = await db.getTableJoinItem(item.joinId);
   res.json(joinItem);
 }
 
 // this will always throw an error
 async function validationRequest(req, res, next) {
-  const { itemId } = req.params;
-  const item = await db.getItem(itemId);
-  if (!item) throw appErrors.noItem({ itemId });
+  const { itemParam } = req.params;
+  const item = await db.getItem(itemParam);
+  if (!item) throw appErrors.noItem({ itemParam });
   const joinItem = await db.getTableJoinItem(item.joinId);
   throw appErrors.thisIsWrong(joinItem);
 }
 
-// this will always throw an error
+// the bad JSON.parse will be catched!
+const faultyJSON = `{
+  "foo": 300,
+  bar: "baz
+}`;
 async function faultyJson(req, res, next) {
-  const { itemId } = req.params;
-  const item = await db.getItem(itemId);
-  if (!item) throw appErrors.noItem({ itemId });
+  const { itemParam } = req.params;
+  const item = await db.getItem(itemParam);
+  if (!item) throw appErrors.noItem({ itemParam });
   const joinItem = await db.getTableJoinItem(item.joinId);
   res.json(JSON.parse(faultyJSON));
 }

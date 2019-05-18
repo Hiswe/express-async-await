@@ -17,19 +17,19 @@ export default routes;
 
 promiseRouter.get(`/sync`, promiseBased.syncRequest);
 promiseRouter.get(`/sync-error`, promiseBased.syncRequestError);
-promiseRouter.get(`/async/:itemId`, promiseBased.asyncRequest);
-promiseRouter.get(`/custom-error/:itemId`, promiseBased.customErrorHandling);
-promiseRouter.get(`/wrapper/:itemId`, promiseBased.asyncHandlerWrapped);
-promiseRouter.get(`/not-wrapped/:itemId`, promiseBased.asyncNoWrapper);
+promiseRouter.get(`/async/:itemParam`, promiseBased.asyncRequest);
+promiseRouter.get(`/custom-error/:itemParam`, promiseBased.customErrorHandling);
+promiseRouter.get(`/wrapper/:itemParam`, promiseBased.asyncHandlerWrapped);
+promiseRouter.get(`/not-wrapped/:itemParam`, promiseBased.asyncNoWrapper);
 
 // because we have wrapped (or not) our exports with express-async-handler
 // we don't need to take care of it here
 // everything that has been exported should be OK
 awaitRouter.get(`/sync`, awaitBased.syncRequest);
 awaitRouter.get(`/sync-error`, awaitBased.syncRequestError);
-awaitRouter.get(`/async/:itemId`, awaitBased.asyncRequest);
-awaitRouter.get(`/custom-error/:itemId`, awaitBased.customErrorHandling);
-awaitRouter.get(`/wrapper/:itemId`, awaitBased.asyncHandlerWrapped);
-awaitRouter.get(`/not-wrapped/:itemId`, awaitBased.asyncNoWrapper);
-awaitRouter.get(`/validation/:itemId`, awaitBased.validationRequest);
-awaitRouter.get(`/faulty-json/:itemId`, awaitBased.faultyJson);
+awaitRouter.get(`/async/:itemParam`, awaitBased.asyncRequest);
+awaitRouter.get(`/custom-error/:itemParam`, awaitBased.customErrorHandling);
+awaitRouter.get(`/wrapper/:itemParam`, awaitBased.asyncHandlerWrapped);
+awaitRouter.get(`/not-wrapped/:itemParam`, awaitBased.asyncNoWrapper);
+awaitRouter.get(`/validation/:itemParam`, awaitBased.validationRequest);
+awaitRouter.get(`/faulty-json/:itemParam`, awaitBased.faultyJson);
