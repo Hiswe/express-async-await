@@ -34,6 +34,8 @@ function asyncRequest(req, res, next) {
   const { itemId } = req.params;
   db.getItem(itemId)
     .then(item => {
+      // we can throw sooner
+      // • this will be handled by our .catch()
       if (!item) throw appErrors.noItem({ itemId });
       return db.getTableJoinItem(item.joinId);
     })

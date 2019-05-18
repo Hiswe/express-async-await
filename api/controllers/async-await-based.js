@@ -3,6 +3,11 @@ import asyncHandler from 'express-async-handler';
 import * as appErrors from '../../helpers/application-errors.js';
 import * as db from '../services/db.js';
 
+const faultyJSON = `{
+  "foo": 300,
+  bar: "baz
+}`;
+
 export default {
   syncRequest: asyncHandler(syncRequest),
   syncRequestError: asyncHandler(syncRequestError),
@@ -16,6 +21,7 @@ export default {
   // • UnhandledPromiseRejectionWarning: Error: validation fail for itemId
   asyncNoWrapper: asyncHandlerWrapped,
   validationRequest: asyncHandler(validationRequest),
+  faultyJson: asyncHandler(faultyJson),
 };
 
 // we can declare even synchronous request as async
@@ -37,6 +43,9 @@ async function asyncRequest(req, res, next) {
   const { itemId } = req.params;
   try {
     const item = await db.getItem(itemId);
+    // we can throw sooner
+    // • this will be handled by our catch()
+    // • even other JS errors will be handled (like JSON.parse)
     if (!item) throw appErrors.noItem({ itemId });
     const joinItem = await db.getTableJoinItem(item.joinId);
     res.json(joinItem);
@@ -76,4 +85,13 @@ async function validationRequest(req, res, next) {
   if (!item) throw appErrors.noItem({ itemId });
   const joinItem = await db.getTableJoinItem(item.joinId);
   throw appErrors.thisIsWrong(joinItem);
+}
+
+// this will always throw an error
+async function faultyJson(req, res, next) {
+  const { itemId } = req.params;
+  const item = await db.getItem(itemId);
+  if (!item) throw appErrors.noItem({ itemId });
+  const joinItem = await db.getTableJoinItem(item.joinId);
+  res.json(JSON.parse(faultyJSON));
 }

@@ -32,3 +32,4 @@ awaitRouter.get(`/custom-error/:itemId`, awaitBased.customErrorHandling);
 awaitRouter.get(`/wrapper/:itemId`, awaitBased.asyncHandlerWrapped);
 awaitRouter.get(`/not-wrapped/:itemId`, awaitBased.asyncNoWrapper);
 awaitRouter.get(`/validation/:itemId`, awaitBased.validationRequest);
+awaitRouter.get(`/faulty-json/:itemId`, awaitBased.faultyJson);
