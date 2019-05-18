@@ -1,0 +1,25 @@
+{
+  "name": "express-async-await",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Hiswe/express-async-await.git",
+  "author": "Hiswe <hiswehalya@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon --require esm express-application.js",
+    "start": "node -r esm express-application.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "chalk": "^2.4.2",
+    "express": "^4.17.0",
+    "express-async-handler": "^1.1.4",
+    "http-errors": "^1.7.2",
+    "morgan": "^1.9.1",
+    "rc": "^1.2.8"
+  },
+  "devDependencies": {
+    "esm": "^3.2.25",
+    "nodemon": "^1.19.0"
+  }
+}
