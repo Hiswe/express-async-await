@@ -1,5 +1,4 @@
 import asyncHandler from 'express-async-handler';
-import createError from 'http-errors';
 
 import * as appErrors from '../../helpers/application-errors.js';
 import * as db from '../services/db.js';

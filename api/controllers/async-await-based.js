@@ -1,5 +1,4 @@
 import asyncHandler from 'express-async-handler';
-import createError from 'http-errors';
 
 import * as appErrors from '../../helpers/application-errors.js';
 import * as db from '../services/db.js';
@@ -74,7 +73,7 @@ async function asyncHandlerWrapped(req, res, next) {
 async function validationRequest(req, res, next) {
   const { itemId } = req.params;
   const item = await db.getItem(itemId);
-  if (!item) throw createError.NotFound(`item not found`);
+  if (!item) throw appErrors.noItem({ itemId });
   const joinItem = await db.getTableJoinItem(item.joinId);
   throw appErrors.thisIsWrong(joinItem);
 }

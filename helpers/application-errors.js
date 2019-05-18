@@ -1,3 +1,6 @@
+// our own error creator
+// • everything should be centralized here
+// • thanks to that we won't need to import `http-errors` anywhere else
 import createError from 'http-errors';
 
 export function spaceOdyssey(additionalParams = {}) {

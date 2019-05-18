@@ -22,6 +22,9 @@ promiseRouter.get(`/custom-error/:itemId`, promiseBased.customErrorHandling);
 promiseRouter.get(`/wrapper/:itemId`, promiseBased.asyncHandlerWrapped);
 promiseRouter.get(`/not-wrapped/:itemId`, promiseBased.asyncNoWrapper);
 
+// because we have wrapped (or not) our exports with express-async-handler
+// we don't need to take care of it here
+// everything that has been exported should be OK
 awaitRouter.get(`/sync`, awaitBased.syncRequest);
 awaitRouter.get(`/sync-error`, awaitBased.syncRequestError);
 awaitRouter.get(`/async/:itemId`, awaitBased.asyncRequest);
