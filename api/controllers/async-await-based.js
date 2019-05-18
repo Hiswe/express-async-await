@@ -8,14 +8,14 @@ export default {
   syncRequest: asyncHandler(syncRequest),
   syncRequestError: asyncHandler(syncRequestError),
   asyncRequest: asyncRequest,
-  asyncRequestWithCustomErrorHandling: asyncRequestWithCustomErrorHandling,
+  customErrorHandling: customErrorHandling,
   // better to wrap on the exports:
   // it's less clutter
   // and easy to spot if we miss one
-  asyncRequestWithWrapper: asyncHandler(asyncRequestWithWrapper),
+  asyncHandlerWrapped: asyncHandler(asyncHandlerWrapped),
   // if we forget to catch somewhere Node will throw a
   // • UnhandledPromiseRejectionWarning: Error: validation fail for itemId
-  asyncRequestWithoutWrapper: asyncRequestWithWrapper,
+  asyncNoWrapper: asyncHandlerWrapped,
   validationRequest: asyncHandler(validationRequest),
 };
 
@@ -47,7 +47,7 @@ async function asyncRequest(req, res, next) {
   }
 }
 
-async function asyncRequestWithCustomErrorHandling(req, res, next) {
+async function customErrorHandling(req, res, next) {
   const { itemId } = req.params;
   try {
     const item = await db.getItem(itemId);
@@ -56,15 +56,13 @@ async function asyncRequestWithCustomErrorHandling(req, res, next) {
     const joinItem = await db.getTableJoinItem(item.joinID);
     res.json(joinItem);
   } catch (error) {
-    // get a very very specific error
-    res.json(
-      createError(500, `custom error response`, { additionalDetails: `none` }),
-    );
+    // get another error
+    next(appErrors.spaceOdyssey());
   }
 }
 
 // we can remove the global try/catch by wrapping with express-async-handler
-async function asyncRequestWithWrapper(req, res, next) {
+async function asyncHandlerWrapped(req, res, next) {
   const { itemId } = req.params;
   const item = await db.getItem(itemId);
   if (!item) throw appErrors.noItem({ itemId });

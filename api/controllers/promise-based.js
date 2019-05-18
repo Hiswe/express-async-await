@@ -8,13 +8,13 @@ export default {
   syncRequest,
   syncRequestError,
   asyncRequest,
-  asyncRequestWithCustomErrorHandling,
+  customErrorHandling,
   // painful to use :
   // • need to return a Promise…
-  asyncRequestWithWrapper: asyncHandler(asyncRequestWithWrapper),
+  asyncHandlerWrapped: asyncHandler(asyncHandlerWrapped),
   // if we forget to catch somewhere Node will throw a
   // • UnhandledPromiseRejectionWarning: Error: validation fail for itemId
-  asyncRequestWithoutWrapper: asyncRequestWithWrapper,
+  asyncNoWrapper: asyncHandlerWrapped,
 };
 
 function syncRequest(req, res) {
@@ -35,7 +35,7 @@ function asyncRequest(req, res, next) {
   const { itemId } = req.params;
   db.getItem(itemId)
     .then(item => {
-      if (!item) throw createError.NotFound(`item not found`);
+      if (!item) throw appErrors.noItem({ itemId });
       return db.getTableJoinItem(item.joinId);
     })
     .then(joinItem => {
@@ -45,12 +45,12 @@ function asyncRequest(req, res, next) {
     .catch(next);
 }
 
-function asyncRequestWithCustomErrorHandling(req, res, next) {
+function customErrorHandling(req, res, next) {
   const { itemId } = req.params;
   return db
     .getItem(itemId)
     .then(item => {
-      if (!item) throw createError.NotFound(`item not found`);
+      if (!item) throw appErrors.noItem({ itemId });
       // make a subtle typo
       return db.getTableJoinItem(item.joinID);
     })
@@ -58,17 +58,17 @@ function asyncRequestWithCustomErrorHandling(req, res, next) {
       res.json(joinItem);
     })
     .catch(error => {
-      res.json(createError.NotFound(`custom error response`));
+      next(appErrors.spaceOdyssey());
     });
 }
 
-function asyncRequestWithWrapper(req, res, next) {
+function asyncHandlerWrapped(req, res, next) {
   const { itemId } = req.params;
   // we need to return the Promise for express-async-handler to operate
   return db
     .getItem(itemId)
     .then(item => {
-      if (!item) throw createError.NotFound(`item not found`);
+      if (!item) throw appErrors.noItem({ itemId });
       return db.getTableJoinItem(item.joinId);
     })
     .then(joinItem => {

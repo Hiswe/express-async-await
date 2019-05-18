@@ -1,46 +1,31 @@
 import express from 'express';
 
 import promiseBased from './controllers/promise-based.js';
-import asyncAwaitBased from './controllers/async-await-based.js';
+import awaitBased from './controllers/async-await-based.js';
 
 const routes = express.Router();
-const promiseRouter = express.Router();
-const asyncAwaitRouter = express.Router();
 
+// we can mount multiple router
+// • less clear to not have the full paths existing
+// • easier to rewrite
+const promiseRouter = express.Router();
+const awaitRouter = express.Router();
 routes.use(`/promise`, promiseRouter);
-routes.use(`/async-await`, asyncAwaitRouter);
+routes.use(`/await`, awaitRouter);
 
 export default routes;
 
 promiseRouter.get(`/sync`, promiseBased.syncRequest);
 promiseRouter.get(`/sync-error`, promiseBased.syncRequestError);
 promiseRouter.get(`/async/:itemId`, promiseBased.asyncRequest);
-promiseRouter.get(
-  `/async-custom-error/:itemId`,
-  promiseBased.asyncRequestWithCustomErrorHandling,
-);
-promiseRouter.get(
-  `/async-wrapper/:itemId`,
-  promiseBased.asyncRequestWithWrapper,
-);
-promiseRouter.get(
-  `/async-wrapper-not-wrapped/:itemId`,
-  promiseBased.asyncRequestWithoutWrapper,
-);
+promiseRouter.get(`/custom-error/:itemId`, promiseBased.customErrorHandling);
+promiseRouter.get(`/wrapper/:itemId`, promiseBased.asyncHandlerWrapped);
+promiseRouter.get(`/not-wrapped/:itemId`, promiseBased.asyncNoWrapper);
 
-asyncAwaitRouter.get(`/sync`, asyncAwaitBased.syncRequest);
-asyncAwaitRouter.get(`/sync-error`, asyncAwaitBased.syncRequestError);
-asyncAwaitRouter.get(`/async/:itemId`, asyncAwaitBased.asyncRequest);
-asyncAwaitRouter.get(
-  `/async-custom-error/:itemId`,
-  asyncAwaitBased.asyncRequestWithCustomErrorHandling,
-);
-asyncAwaitRouter.get(
-  `/async-wrapper/:itemId`,
-  asyncAwaitBased.asyncRequestWithWrapper,
-);
-asyncAwaitRouter.get(
-  `/async-wrapper-not-wrapped/:itemId`,
-  asyncAwaitBased.asyncRequestWithoutWrapper,
-);
-asyncAwaitRouter.get(`/validation/:itemId`, asyncAwaitBased.validationRequest);
+awaitRouter.get(`/sync`, awaitBased.syncRequest);
+awaitRouter.get(`/sync-error`, awaitBased.syncRequestError);
+awaitRouter.get(`/async/:itemId`, awaitBased.asyncRequest);
+awaitRouter.get(`/custom-error/:itemId`, awaitBased.customErrorHandling);
+awaitRouter.get(`/wrapper/:itemId`, awaitBased.asyncHandlerWrapped);
+awaitRouter.get(`/not-wrapped/:itemId`, awaitBased.asyncNoWrapper);
+awaitRouter.get(`/validation/:itemId`, awaitBased.validationRequest);
