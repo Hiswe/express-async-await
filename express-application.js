@@ -62,13 +62,16 @@ app.get(`/`, (req, res) => {
 app.all(`/*`, (req, res, next) => next(new createError.NotImplemented()));
 
 app.use(function expressErrorHandler(err, req, res, next) {
-  const status = err.status || err.statusCode || (err.status = 500);
-  if (status >= 500) console.trace(err);
+  const errStatus = err.status || err.statusCode || (err.status = 500);
+  const errMessage = err.message || `an error as occurred`;
+  console.log(err);
   const stack = err.stack ? err.stack : new Error(err).stack;
-  res.status(status).json({
-    status,
-    message: err.message || `an error as occurred`,
-    stack: stack.split(`\n`).map(line => line.trim()),
+  const errStack = stack.split(`\n`).map(line => line.trim());
+  res.status(errStatus).json({
+    ...err,
+    status: errStatus,
+    message: errMessage,
+    stack: errStack,
   });
 });
 

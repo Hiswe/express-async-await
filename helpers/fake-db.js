@@ -5,9 +5,8 @@ export const JOIN_ID = `join-id`;
 
 export async function getItem(itemParam) {
   await wait();
-  if (!itemParam) return null;
-  if (itemParam === VALID_PARAM) return { itemParam, joinId: JOIN_ID };
-  throw new Error(`validation fail for itemId`, itemParam);
+  if (itemParam !== VALID_PARAM) return null;
+  return { itemParam, joinId: JOIN_ID };
 }
 
 export async function getTableJoinItem(joinId) {

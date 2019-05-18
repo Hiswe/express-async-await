@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import createError from 'http-errors';
 
-import * as db from '../fake-db/index.js';
+import * as db from '../helpers/fake-db';
 
 export default {
   syncRequest,
@@ -34,6 +34,7 @@ function asyncRequest(req, res, next) {
   const { itemId } = req.params;
   db.getItem(itemId)
     .then(item => {
+      if (!item) throw createError.NotFound(`item not found`);
       return db.getTableJoinItem(item.joinId);
     })
     .then(joinItem => {
@@ -48,6 +49,7 @@ function asyncRequestWithCustomErrorHandling(req, res, next) {
   return db
     .getItem(itemId)
     .then(item => {
+      if (!item) throw createError.NotFound(`item not found`);
       // make a subtle typo
       return db.getTableJoinItem(item.joinID);
     })
@@ -65,6 +67,7 @@ function asyncRequestWithWrapper(req, res, next) {
   return db
     .getItem(itemId)
     .then(item => {
+      if (!item) throw createError.NotFound(`item not found`);
       return db.getTableJoinItem(item.joinId);
     })
     .then(joinItem => {

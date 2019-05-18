@@ -11,6 +11,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon --require esm express-application.js",
+    "prettier": "prettier --config .prettierrc.js --write *.js **/*.js",
     "start": "node -r esm express-application.js",
     "toc": "doctoc README.md --github"
   },
@@ -26,6 +27,7 @@
   "devDependencies": {
     "doctoc": "^1.4.0",
     "esm": "^3.2.25",
-    "nodemon": "^1.19.0"
+    "nodemon": "^1.19.0",
+    "prettier": "1.17.1"
   }
 }
