@@ -1,5 +1,7 @@
 const wait = (t = 300, val) => new Promise(r => setTimeout(() => r(val), t));
 
+// this is a fake DB for the example
+
 export const VALID_PARAM = `valid-param`;
 export const JOIN_ID = `join-id`;
 

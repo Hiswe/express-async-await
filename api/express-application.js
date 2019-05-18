@@ -1,15 +1,15 @@
-import util from 'util';
 import express from 'express';
 import morgan from 'morgan';
 import chalk from 'chalk';
 import bodyParser from 'body-parser';
-import createError from 'http-errors';
 
-import pkg from './package.json';
-import config from './node.config.js';
+import pkg from '../package.json';
+import config from '../node.config.js';
+import * as appErrors from '../helpers/application-errors.js';
 import routes from './routes';
 
 const app = express();
+export default app;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -59,31 +59,22 @@ app.get(`/`, (req, res) => {
 //////
 
 // everything that go there without an error should be treated as a 501
-app.all(`/*`, (req, res, next) => next(new createError.NotImplemented()));
+app.all(`/*`, (req, res, next) => next(appErrors.notImplemented()));
 
 app.use(function expressErrorHandler(err, req, res, next) {
+  console.log(err);
+  // anything can come here
+  // • make sure we have the minimum error informations
   const errStatus = err.status || err.statusCode || (err.status = 500);
   const errMessage = err.message || `an error as occurred`;
-  console.log(err);
   const stack = err.stack ? err.stack : new Error(err).stack;
   const errStack = stack.split(`\n`).map(line => line.trim());
-  res.status(errStatus).json({
+  const errorResponse = {
     ...err,
     status: errStatus,
     message: errMessage,
-    stack: errStack,
-  });
-});
-
-//////
-// LAUNCHING
-//////
-
-const server = app.listen(config.API_PORT, function endInit() {
-  console.log(
-    chalk.green(`Server is listening on port`),
-    chalk.cyan(server.address().port),
-    chalk.green(`on mode`),
-    chalk.cyan(config.NODE_ENV),
-  );
+  };
+  // we don't want the stack to leak in production mode
+  if (config.isDev) errorResponse.stack = errStack;
+  res.status(errStatus).json(errorResponse);
 });

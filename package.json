@@ -10,9 +10,9 @@
   "author": "Hiswe <hiswehalya@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon --require esm express-application.js",
+    "dev": "nodemon --require esm start-application.js",
     "prettier": "prettier --config .prettierrc.js --write *.js **/*.js",
-    "start": "node -r esm express-application.js",
+    "start": "NODE_ENV=production node -r esm start-application.js",
     "toc": "doctoc README.md --github"
   },
   "dependencies": {
